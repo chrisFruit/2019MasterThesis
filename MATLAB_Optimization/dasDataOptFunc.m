@@ -12,23 +12,8 @@ if optType == 0 %Dual Rate
     b = [];
     Aeq = [];
     beq = [];
-%    Test 1
-%     lbx = [1e2,  60e3,  1e2,  120e3]; % Row
-%     ubx = [1e6, 120e3, 1e12,  230e3];
     
-%   Test 2
-%     lbx = [1,   60e3,  1e2,   120e3]; % Row
-%     ubx = [1e6, 120e3, 1e12,  230e3];
-    
-% %   Test 3
-%     lbx = [1,   60e3,  1,   120e3]; % Row
-%     ubx = [1e6, 120e3, 1e12,  230e3];
-
-% %       Test 4:
-%     lbx = [1e2, 60e3,  1e5,   120e3]; % Row
-%     ubx = [1e6, 120e3, 1e12,  230e3];
-
-%   Test 5:
+    %    Test 1
     lbx = [1e2, 60e3,  1e5,   120e3]; % Row
     ubx = [1e6, 120e3, 1e12,  300e3];
 
