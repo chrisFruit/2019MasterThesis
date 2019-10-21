@@ -55,39 +55,43 @@ Foam::scalar Foam::ReactingMultiphaseParcel<ParcelType>::CpEff
     const label idS
 ) const
 {
+// Defines which Cp model to use	
 #define KirovCp
-
+	
+//OpenFOAM Cp Model
 #ifdef OFCp
     return
         this->Y_[GAS]*cloud.composition().Cp(idG, YGas_, p, T)
       + this->Y_[LIQ]*cloud.composition().Cp(idL, YLiquid_, p, T)
       + this->Y_[SLD]*cloud.composition().Cp(idS, YSolid_, p, T);
 #endif
-
+	
+//Kirov Model Implementation 
 #ifdef KirovCp
-    
-	//DAF mass fraction
-	//Water and ash included as water plays a part in the Cp value before devol is active
+    //Calculating DAF mass fraction
+    //Ash must be in second position within constant/coalCloud1Properties file
     const scalar massFractionDAF = this->Y_[GAS] + this->Y_[SLD]*YSolid_[0];
 
-	//Volatile matter DAF mass fraction
+    //DAF Mass Fraction of Gaseous Volatile Matter 
     const scalar Y_VM = this->Y_[GAS]/massFractionDAF;
 
-	//Fixed carbon DAF mass fraction
+    //DAF Mass Fraction of Fixed Carbon 
     const scalar Y_FC = (this->Y_[SLD]*YSolid_[0])/massFractionDAF;
 
-	//Kirov Cp Models
+    //Cp of Fixed Carbon 
     const scalar Cp_FC = (-0.218 + (3.807e-3)*T - (1.758e-6)*T*T)*1000;
+    
+    //Cp of Primary and Secondary Volatiles 
     const scalar Cp_VM1 = (0.728 + (3.391e-3)*T)*1000;
     const scalar Cp_VM2 = (2.273 + (2.554e-3)*T)*1000;
 
+    //Calculating Particle Cp Value 
+    //Fixed Carbon Calculation
     scalar Cp_Kirov = 0.0;
-
-    //Calculating Cp based on Kirov Model
-    //Cp of fixed carbon
     Cp_Kirov += Y_FC*Cp_FC;
 
-    //Cp of volatile matter
+    //Primary and Secondary Volatiles Calculation
+    //Condition: Secondary contains max. of 0.1 of total gaseous VM
     if (Y_VM > 0.1)
     {
         Cp_Kirov += (Y_VM-0.1)*Cp_VM1 + 0.1*Cp_VM2;
@@ -102,72 +106,6 @@ Foam::scalar Foam::ReactingMultiphaseParcel<ParcelType>::CpEff
     }
 
     return Cp_Kirov;
-#endif
-
-#ifdef MerrickCp
-
-    //gas constant 8314 J/(mol*K)
-    const scalar r = 8.314;
-
-//std::cout << "-x x x x x -             USER_CpEff_CALLED       - x xx  x x x x x - "<< nl;
-    //DAF mass fraction
-    const scalar massFractionDAF = this->Y_[GAS] + this->Y_[SLD]*YSolid_[0];
-
-    //Volatile matter DAF mass fraction
-    const scalar Y_CH4 = (this->Y_[GAS]*YGas_[0])/massFractionDAF;
-    const scalar Y_H2 = (this->Y_[GAS]*YGas_[1])/massFractionDAF;
-    const scalar Y_CO2 = (this->Y_[GAS]*YGas_[2])/massFractionDAF;
-    const scalar Y_CO = (this->Y_[GAS]*YGas_[3])/massFractionDAF;
-	
-//	Info<< " Y_CH4: " << Y_CH4 << nl; 
-//	Info<< " Y_H2: " << Y_H2 << nl;                
-//	Info<< " Y_CO2: " << Y_CO2 << nl;                
-//	Info<< " Y_CO: " << Y_CO << nl;                
-
-    //Fixed carbon DAF mass fraction
-    const scalar Y_C = (this->Y_[SLD]*YSolid_[0])/massFractionDAF;
-
-//	Info<< " Y_C: " << Y_C << nl << nl; 
-
-    //Gaseous Molar Masses
-    const scalar M_CH4 = 1.604e-2; 
-    const scalar M_H2 = 2.016e-3; 
-    const scalar M_CO2 = 4.401e-2; 
-    const scalar M_CO = 2.801e-2; 
-    
-    //Solid Molar Mass
-    const scalar M_C = 1.201e-2; 
-
-    //Average Molar Mass of Particle DAF Species
-    const scalar M_avg_inv = Y_CH4/M_CH4 + Y_H2/M_H2 + Y_CO2/M_CO2 + Y_CO/M_CO + Y_C/M_C;
-
-//	Info<< " M_CH4/Y_CH4: " << M_CH4/Y_CH4 << nl; 
-//	Info<< " M_H2/Y_H2: " << M_H2/Y_H2 << nl;
-//	Info<< " M_CO2/Y_CO2: " << M_CO2/Y_CO2 << nl; 
-//	Info<< " M_CO/Y_CO: " << M_CO/Y_CO << nl;
-//	Info<< " M_C/Y_C: " << M_C/Y_C << nl;
-//	Info<< " M_avg: " << M_avg_inv << nl;  
-
-    // F1 - 380K
-    const scalar O1 = 380/T;
-    const scalar F1 = exp(O1)/pow(((exp(O1)-1)/O1), 2);
-
-//	Info<< " O1: " << O1 << nl;
-//	Info<< " F1: " << F1 << nl;
-
-    // F2 - 1800K
-    const scalar O2 = 1800/T;
-    const scalar F2 = exp(O2)/pow(((exp(O2)-1)/O2), 2);
-
-//	Info<< " O2: " << O2 << nl; 
-//	Info<< " F2: " << F2 << nl; 
-
-    const scalar Cp_Merrick = (r*M_avg_inv)*(F1 + 2*F2);
-
-//	Info<< " Cp_Merrick: " << Cp_Merrick << nl; 
-
-    return Cp_Merrick;
-
 #endif
 }
 
