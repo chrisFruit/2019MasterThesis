@@ -16,3 +16,7 @@ Source code for OpenFOAM modifications
 >>> DualCompetingRateDevolatilisation/:
 - Contains the source and header file for the dual-competing rate solver. 
 - The actual model implementation is found in the source file on line #139.
+
+>>> MATLAB_Optimization/:
+- Contains the full optimization routine for the kinetic parameters
+- The mass loss sub-routine is described between lines #70-133
