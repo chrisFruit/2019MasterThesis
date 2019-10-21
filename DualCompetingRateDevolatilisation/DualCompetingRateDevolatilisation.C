@@ -137,7 +137,6 @@ void Foam::DualCompetingRateDevolatilisation<CloudType>::calculate
         
         // Mass transferred from particle to carrier gas phase
         dMassDV[id] = min((a1*k1 + a2*k2)*massVolatile*dt, massVolatile);
-
 	}
     if (done && canCombust != -1)
     {
