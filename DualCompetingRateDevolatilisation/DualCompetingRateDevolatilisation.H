@@ -38,22 +38,28 @@ Description
         kappa = rate constant
         A1    = activation energy (user input)
         E     = pre-exponential factor (user input)
-        R     = universal gas constant
+        R     = universal gas constant 
         T     = temperature
 
     Usage:
 
-        DualCompetingRateDevolatilisationCoeffs
+        dualCompetingRateDevolatilisationCoeffs
         {
             volatileData
             (
-                (CH4     12     0.5)   // (name A1 E)
-                (CO2     12     0.5 X )   // (name A1 E multiplier)
+                (CH4     0.l5	1e3     1e5
+			 1.00	1e5	1e5)   // (name a1 A1 E1 a2 A2 E2)
+                (CO2     0.l5	1e3	1e5
+			 1.00	1e5	1e5)   // (name a1 A1 E1 a2 A2 E2)
             );
 
             volatileResidualCoeff 1e-6;
         }
-
+	
+    NOTE:
+	
+	R uses kmol insteasd of mol. 
+	
 \*---------------------------------------------------------------------------*/
 
 #ifndef DualCompetingRateDevolatilisation_H
@@ -86,8 +92,8 @@ class DualCompetingRateDevolatilisation
             //- Specie name
             word name_;
 
-		    //- Stoichiometric coefficient - 1
-	    	scalar a1_;
+	    //- Stoichiometric coefficient - 1
+	    scalar a1_;
 
             //- Pre-exponential factor - 1
             scalar A1_;
@@ -95,8 +101,8 @@ class DualCompetingRateDevolatilisation
             //- Activiation Energy - 1
             scalar E1_;
 
-		    //- Stoichiometric coefficient - 1
-		    scalar a2_;
+	    //- Stoichiometric coefficient - 1
+	    scalar a2_;
 
             //- Pre-exponential factor - 2
             scalar A2_;
@@ -104,7 +110,7 @@ class DualCompetingRateDevolatilisation
             //- Activiation Energy - 2
             scalar E2_;
 
-        	// Addressing
+	    // Addressing
 
             //- Ash positions in global/local lists
             label ashLocalId_;
@@ -117,11 +123,11 @@ class DualCompetingRateDevolatilisation
             volatileData()
             :
                 name_(word::null),
-				a1_(0.0),
+		a1_(0.0),
                 A1_(0.0),
                 E1_(0.0),
-				a2_(0.0),
-				A2_(0.0),
+		a2_(0.0),
+		A2_(0.0),
                 E2_(0.0)
             {}
 
@@ -129,10 +135,10 @@ class DualCompetingRateDevolatilisation
             volatileData(Istream& is)
             :
                 name_(is),
-				a1_(readScalar(is)),
+		a1_(readScalar(is)),
                 A1_(readScalar(is)),
                 E2_(readScalar(is)),
-				a2_(readScalar(is)),
+		a2_(readScalar(is)),
                 A2_(readScalar(is)),
                 E2_(readScalar(is))
             {}
@@ -141,10 +147,10 @@ class DualCompetingRateDevolatilisation
             volatileData(const volatileData& vd)
             :
                 name_(vd.name_),
-				a1_(vd.a1_),
+		a1_(vd.a1_),
                 A1_(vd.A1_),
                 E1_(vd.E1_),
-				a2_(vd.a2_),
+		a2_(vd.a2_),
                 A2_(vd.A2_),
                 E2_(vd.E2_)
             {}
@@ -218,10 +224,10 @@ class DualCompetingRateDevolatilisation
             {
                 os  << token::BEGIN_LIST
                     << vd.name_ << token::SPACE
-				    << vd.a1_ << token::SPACE
+		    << vd.a1_ << token::SPACE
                     << vd.A1_ << token::SPACE
                     << vd.E1_ << token::SPACE
-				    << vd.a2_ << token::SPACE
+		    << vd.a2_ << token::SPACE
                     << vd.A2_ << token::SPACE	
                     << vd.E2_ << token::END_LIST;
 
