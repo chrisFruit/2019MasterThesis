@@ -1,0 +1,4 @@
+SOURCE = \
+coalFoam.C \
+
+# sources
