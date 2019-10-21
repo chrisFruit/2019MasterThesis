@@ -1,8 +1,11 @@
-function output = pyroOptFunc(V,Y1,optType) 
-
+function output = fullOptFunc(V,Y1,optType)
+% V = Volatile type 
+% Y1 = low temperature weight loss value based on proximate analysis
+% optType = 0 for dual-comepting rate, 1 for single kinetic rate 
 
 %% ga Optimization Initialization
-if optType == 0 %Dual Rate
+% Dual Rate Optimization 
+if optType == 0
     
     options.PopulationSize = 100;
     options.Display = 'iter';
@@ -12,16 +15,16 @@ if optType == 0 %Dual Rate
     b = [];
     Aeq = [];
     beq = [];
-    
-    %    Test 1
-    lbx = [1e2, 60e3,  1e5,   120e3]; % Row
+    %Boundary Conditions
+    lbx = [1e2, 60e3,  1e5,   120e3];
     ubx = [1e6, 120e3, 1e12,  300e3];
 
     FUNKY = @TGAOPT;
 
     [X_OPT,fval,exitflag,output] = ga(FUNKY,nvars,A,b,Aeq,beq,lbx,ubx,[],options);
     
-else %Single Rate
+%Single Rate Optimization Routine
+else
     
     options.PopulationSize = 50;
     options.Display = 'iter';
@@ -31,21 +34,8 @@ else %Single Rate
     b = [];
     Aeq = [];
     beq = [];
-    
-    % Test 1:
-%     lbx = [1e2, 60e3];  %40 w/ 1e-8
-%     ubx = [1e6, 120e3];
-% %     %Test 2:
-%     lbx = [1,   60e3];  %50 w/ 1e-8
-%     ubx = [1e6, 120e3];
-% %     %Test 3:
-%     lbx = [1,    60e3];  %50 w/ 1e-8
-%     ubx = [1e12, 230e3];
-%     %Test 4:
-%     lbx = [10,    60e3];  %50 w/ 1e-8
-%     ubx = [1e12, 230e3];
-%     %Test 5:
-    lbx = [1,    60e2];  %50 w/ 1e-8
+    %Boundary Conditions
+    lbx = [1,    60e2];
     ubx = [1e12, 230e3];
 
     FUNKY = @TGAOPT;
@@ -57,10 +47,9 @@ end
     function out = alphaFunc(Mass_,mLength)
 
         for I = [1:1:mLength]
-
               f_(I,1) = 1 - (Mass_(1) - Mass_(I))/Mass_(1);
         end
-
+        
         out = f_;
     end
 
@@ -77,7 +66,7 @@ end
         % Empty alpha matrix
         mLength = length(T);  
      
-        % Complete devolatilisation check
+        % Mass loss routine
         if optType == 0 %Singular Devol.
             M_ = Mg*Y1;
             Mass_ = zeros(mLength,1);
