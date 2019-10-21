@@ -118,26 +118,25 @@ void Foam::DualCompetingRateDevolatilisation<CloudType>::calculate
         const scalar massVolatile0 = mass0*YVolatile0_[i];
         const scalar massVolatile = mass*YGasEff[id];
 		
-		cout << "_______________DUAL_COMPETE______USER DIR________________________";
-
+        //Ash must be declared as second variable in the thermophysical file 
         // Combustion allowed once all volatile components evolved
         done = done && (massVolatile <= residualCoeff_*massVolatile0);
 
-		// Model coefficients
-		const scalar a1 = volatileData_[i].a1();
-		const scalar A1 = volatileData_[i].A1();
-		const scalar E1 = volatileData_[i].E1();
-
-		const scalar a2 = volatileData_[i].a2();
-		const scalar A2 = volatileData_[i].A2();
-		const scalar E2 = volatileData_[i].E2();
-
-		// Kinetic Rates
-		const scalar k1 = A1*exp(-E1/(RR*T));
-		const scalar k2 = A2*exp(-E2/(RR*T)); 
-
-		// Mass transferred from particle to carrier gas phase
-		dMassDV[id] = min((a1*k1 + a2*k2)*massVolatile*dt, massVolatile);
+        // Model coefficients
+        const scalar a1 = volatileData_[i].a1();
+        const scalar A1 = volatileData_[i].A1();
+        const scalar E1 = volatileData_[i].E1();
+        
+        const scalar a2 = volatileData_[i].a2();
+        const scalar A2 = volatileData_[i].A2();
+        const scalar E2 = volatileData_[i].E2();
+        
+        // Kinetic Rates
+        const scalar k1 = A1*exp(-E1/(RR*T));
+        const scalar k2 = A2*exp(-E2/(RR*T)); 
+        
+        // Mass transferred from particle to carrier gas phase
+        dMassDV[id] = min((a1*k1 + a2*k2)*massVolatile*dt, massVolatile);
 
 	}
     if (done && canCombust != -1)
