@@ -1,0 +1,44 @@
+#!/bin/sh
+cd ${0%/*} || exit 1                        # Run from this directory
+. $WM_PROJECT_DIR/bin/tools/RunFunctions    # Tutorial run functi
+
+rm -r processor*
+
+rm -r Gnu*
+
+rm log*
+
+echo Running Test at Temperature 2100K
+echo Copying T and U 
+
+cp Temp/2100K 0/T
+cp Velo/2100U 0/U
+cp Coal/CHN500 constant/coalCloud1Properties
+
+sed -i 's/xxx/9.06/g' constant/coalCloud1Properties
+
+echo Running Case
+
+runApplication renumbermesh -overwrite
+
+runApplication decomposePar
+
+pyFoamRunner.py --autosense-parallel bioCoalChemFoam
+
+echo Gathering Data
+
+mkdir allTest2/CHN500_2100
+
+cp -r 0/ allTest2/CHN500_2100/
+
+mv PyFoamRunner.bioCoalChemFoam.logfile allTest2/CHN500_2100/
+
+mv processor* allTest2/CHN500_2100/
+
+cp Coal/CHN500_2100 allTest2/CHN500_2100/
+
+cp -r system/ allTest2/CHN500_2100/
+
+rm -r PyFoam*
+
+rm -r Gnu*

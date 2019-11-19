@@ -1,0 +1,228 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1806                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      biomassCloud1Properties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solution
+{
+    active          true;
+    transient       yes;
+    coupled         true;
+    cellValueSourceCorrection on;
+    maxCo           0.3;
+
+    sourceTerms
+    {
+        schemes
+        {
+            rho             semiImplicit 1;
+            U               semiImplicit 1;
+            Yi              semiImplicit 1;
+            h               semiImplicit 1;
+            radiation       semiImplicit 1;
+        }
+    }
+
+    interpolationSchemes
+    {
+        rho             cell;
+        U               cellPoint;
+        thermo:mu       cell;
+        T               cell;
+        Cp              cell;
+        kappa           cell;
+        p               cell;
+        G               cell;
+    }
+
+    integrationSchemes
+    {
+        U               Euler;
+        T               analytical;
+    }
+}
+
+constantProperties
+{
+    rho0            1000;
+    T0              273;
+    Cp0             4187;       // Heat capacity [J/(kg*K)] 
+    epsilon0        1;		// Particle emissivity []
+    f0              0.5;	// Particle scattering factor 
+
+    TDevol          400;	// Devolatilisation Temperature [K]
+    LDevol          0;		// Latent heat of devolatilisation [J/kg] ANSYS
+    hRetentionCoeff 1;		// Fraction of enthalpy retained by
+				// parcel due to surface reactions
+	
+    constantVolume  false;
+}
+
+subModels
+{
+    particleForces
+    {
+        sphereDrag;
+        gravity;
+    }
+
+    injectionModels
+    {
+        model1
+        {
+            type            	patchInjection;
+            massTotal       	2.5e-6;		// Mass feed rate = 0.15 gm/min = 2.5e-6 kg/s
+            SOI             	3;
+            duration      	1;
+	    patch	    	inlet;
+            parcelBasisType 	mass;
+            parcelsPerSecond	1e4;
+            U0              (0 0 -0.22); 	// Carrier flow rate at 1510K
+	    flowRateProfile constant 1;
+            sizeDistribution
+            {
+                type        fixedValue;
+                fixedValueDistribution
+                {
+                    value        5.75e-05;	// Kobayashi - PhD - Mean Bit Coal Diameter
+                }
+            }
+        }
+    }
+
+    dispersionModel stochasticDispersionRAS;
+
+    patchInteractionModel standardWallInteraction;
+
+    heatTransferModel RanzMarshall;
+
+    compositionModel singleMixtureFraction;
+
+    phaseChangeModel liquidEvaporation;
+
+    devolatilisationModel kobayashiDevolatilisation;
+
+    stochasticCollisionModel none;
+
+    surfaceReactionModel COxidationKineticDiffusionLimitedRate;
+
+    surfaceFilmModel none;
+
+    radiation       on;
+
+    standardWallInteractionCoeffs
+    {
+        type            rebound;
+        e               1;
+        mu              0;
+    }
+
+    RanzMarshallCoeffs
+    {
+        BirdCorrection  true;
+    }
+
+    singleMixtureFractionCoeffs
+    {
+        phases
+        (
+            gas
+            {
+                CH4             0.604; //0.223; //Chinese Volatile Release at 1273K, <75e-6 Particle
+                H2              0.099; //0.634; 
+                CO2             0.297; //0.046;
+		//CO		0.097;
+            }
+            liquid
+            {
+                H2O             1;
+            }
+            solid
+            {
+                ash             0.136304; //0.189142; //Kobayashi - Bituminous Coal
+                C               0.863696; //0.810858;
+            }
+        );
+        YGasTot0        0.407; //0.407; //Kobayashi - Bituminous Coal
+        YLiquidTot0     0.022; //0.022;
+        YSolidTot0      0.571; //0.571;
+    }
+
+    liquidEvaporationCoeffs
+    {
+        enthalpyTransfer enthalpyDifference;
+
+        activeLiquids
+        (
+            H2O
+        );
+    }
+
+//**********************DEVOL-COEFFS*****************************************//
+
+// Gas Consant (RR) = J/(kmol*K)
+// Pre-exponential Factor (A) = 1/s
+// Activation Energy (E) = J/kmol
+
+// Kobayashi - PhD - Fig 7.4
+// 706 1/s - 11.8 Kcal/mole - 4.937e7 j/kmol
+// 1e5 1/s - 30 Kcal/mole - 1.255e8 j/kmol
+
+
+/*    singleKineticRateDevolatilisationCoeffs
+    {
+        volatileData
+        (    //             A    E
+            (CH4            706         11.8)
+            (CO2            706         11.8)
+            (H2             706         11.8)
+        );
+        residualCoeff   0.001;
+    }
+
+
+*/ 
+
+    kobayashiDevolatilisationCoeffs
+    {
+        volatileData
+        (
+            (CH4            0.46 	706		4.94e7
+			    1		1e5		1.26e8)
+            (H2             0.46 	706		4.94e7
+			    1		1e5		1.26e8)
+            (CO2            0.46 	706		4.94e7
+			    1		1e5		1.26e8)
+        );
+        residualCoeff   0.001;
+    } 
+
+//***************************************************************************//
+
+    COxidationKineticDiffusionLimitedRateCoeffs
+    {
+        Sb              1;
+        C1              5.0E-12;
+        C2              0.002;
+        E               7.9E+07;
+    }
+}
+
+
+cloudFunctions
+{}
+
+
+// ************************************************************************* //

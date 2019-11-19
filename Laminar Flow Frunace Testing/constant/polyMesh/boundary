@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1806                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+6
+(
+    inlet
+    {
+        type            patch;
+        nFaces          280;
+        startFace       70564;
+    }
+    inletWall
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          196;
+        startFace       70844;
+    }
+    carrierInlet
+    {
+        type            patch;
+        nFaces          160;
+        startFace       71040;
+    }
+    furnaceWall
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          560;
+        startFace       71200;
+    }
+    outlet
+    {
+        type            patch;
+        nFaces          636;
+        startFace       71760;
+    }
+    symmetryPlane
+    {
+        type            symmetryPlane;
+        inGroups        1(symmetryPlane);
+        nFaces          3280;
+        startFace       72396;
+    }
+)
+
+// ************************************************************************* //

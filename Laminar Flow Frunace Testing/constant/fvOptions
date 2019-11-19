@@ -1,0 +1,42 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  plus                                  |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      fvOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+     limitT
+     {
+         type            limitTemperature;
+         active          yes;
+ 
+         selectionMode   all;
+         min             250;
+         max             2500;
+         //phase           gas; //optional
+     }
+/*
+source1
+{
+    type            fixedTemperatureConstraint;
+
+    timeStart       0.005;
+    duration        0.020;
+    selectionMode   cellSet;
+    cellSet         ignitionCells;
+
+    mode            uniform;
+    temperature     2000;
+}*/
+
+// ************************************************************************* //
